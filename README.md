@@ -31,12 +31,12 @@ This function is the constructor of your module, and will have to define the met
 ```js
 function LoadBox_initHourglass(box) {
     // Initialisation of the module
-    ...
+    // ...
 
     // Definition of the step function
     box.step = function() {
         // Simulate the step
-	...
+	// ...
 
 	// Render the step
 	box._ctx.drawImage(...);
