@@ -36,10 +36,10 @@ function LoadBox_initHourglass(box) {
     // Definition of the step function
     box.step = function() {
         // Simulate the step
-	// ...
+        // ...
 
-	// Render the step
-	box._ctx.drawImage(...);
+        // Render the step
+        box._ctx.drawImage(...);
     };
 }
 ```
