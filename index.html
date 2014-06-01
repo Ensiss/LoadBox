@@ -2,14 +2,22 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <script src="src/hourglass.js"></script>
+    <script src="src/gameoflife.js"></script>
     <script src="src/loadbox.js"></script>
   </head>
 
   <body>
     <div id="loader">
-      Hourglass loader:</br>
+      GameOfLife loader:</br>
       <script>
-	var loader = new LoadBox("hourglass");
+	var loader = new LoadBox("gameoflife", {
+	fps: 25,
+	aliveProba: 0.5,
+	warp: true,
+	width: 300,
+	height: 300,
+	mapWidth: 100,
+	mapHeight: 100});
 	loader.show();
       </script>
     </div>

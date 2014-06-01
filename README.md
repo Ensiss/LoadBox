@@ -23,6 +23,23 @@ var loader = new LoadBox("hourglass", {
 loader.show();
 ```
 
+### Conway's Game Of Life loader
+
+```js
+var loader = new LoadBox("gameoflife", {
+    container: "container-id", // (default = document body)
+    width: 100, // Width of the loader
+    height: 100, // Height of the loader
+    fps: 25, // Number of frames per second
+
+    aliveProba: 0.5, // Chance that each cell will spawn alive
+    warp: true, // If the borders are connected
+    mapWidth: 20, // Number of horizontal cells
+    mapHeight: 20 // Number of vertical cells
+});
+loader.show();
+```
+
 ### How to extend ?
 
 Create a .js file that will be loaded before loadbox.js in your html document.
