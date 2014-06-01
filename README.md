@@ -3,7 +3,7 @@ LoadBox
 
 HTML5/javascript modular loader based on canvas.
 
-I also made a very basic [demo](http://ensiss.github.io/LoadBox/)
+I also made a very basic [demo](http://ensiss.github.io/LoadBox/).
 
 ## Documentation
 
@@ -37,7 +37,10 @@ var loader = new LoadBox("gameoflife", {
     aliveProba: 0.5, // Chance that each cell will spawn alive
     warp: true, // If the borders are connected
     mapWidth: 20, // Number of horizontal cells
-    mapHeight: 20 // Number of vertical cells
+    mapHeight: 20, // Number of vertical cells
+    cellColor: "#000000", // Color of an alive cell
+    deadColor: "#FFFFFF", // Color of a dead cell
+    gridColor: "#000000", // Color of the grid. The grid is not drawn if this is not defined
     patterns: [ // Array of patterns used to create a scene
     ["glider",
     " o",

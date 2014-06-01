@@ -114,9 +114,16 @@ function LoadBox_initGameoflife(box) {
 	box._i = !box._i;
 
 	box._ctx.clearRect(0, 0, box._canvas.width, box._canvas.height);
-	box._ctx.fillStyle = "#000000"
-	for (var i in box._alive) {
-	    box._ctx.fillRect(getX(box._alive[i]) * box._nw, getY(box._alive[i]) * box._nh, box._nw, box._nh);
+	for (var i in box._map[box._i]) {
+	    if (box._map[box._i][i])
+		box._ctx.fillStyle = box._params.cellColor || "#000000";
+	    else
+		box._ctx.fillStyle = box._params.deadColor || "#FFFFFF";
+	    box._ctx.fillRect(getX(i) * box._nw, getY(i) * box._nh, box._nw, box._nh);
+	    if (box._params.gridColor) {
+		box._ctx.strokeStyle = box._params.gridColor || "#000000";
+		box._ctx.strokeRect(getX(i) * box._nw, getY(i) * box._nh, box._nw, box._nh);
+	    }
 	}
     };
 }
