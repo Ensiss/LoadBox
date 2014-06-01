@@ -3,6 +3,8 @@ LoadBox
 
 HTML5/javascript modular loader based on canvas.
 
+I also made a very basic [demo](http://ensiss.github.io/LoadBox/)
+
 ## Documentation
 
 ### Hourglass loader
@@ -36,12 +38,12 @@ var loader = new LoadBox("gameoflife", {
     warp: true, // If the borders are connected
     mapWidth: 20, // Number of horizontal cells
     mapHeight: 20 // Number of vertical cells
-    patterns: [
+    patterns: [ // Array of patterns used to create a scene
     ["glider",
     " o",
     "  o",
-    "ooo"]], // Array of patterns used to create a scene
-    init: [
+    "ooo"]],
+    init: [ // Array of patterns, where and how to put them
     {name: "glider", x:0, y:0, flip:false, flop:false}]
 });
 loader.show();
