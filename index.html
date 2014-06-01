@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="src/hourglass.js"></script>
+    <script src="src/gameoflife.js"></script>
+    <script src="src/loadbox.js"></script>
+  </head>
+
+  <body>
+    <table border>
+      <tbody>
+	<tr>
+	  <td>GameOfLife glider</td>
+	  <td>GameOfLife random init</td>
+	  <td>Hourglass loader</td>
+	</tr>
+	<tr>
+	  <td id="glider" align="center">
+	    <script>
+	      var l1 = new LoadBox("gameoflife", {
+	      container: "glider",
+	      fps: 10,
+	      aliveProba: 0.5,
+	      warp: true,
+	      width: 100,
+	      height: 100,
+	      mapWidth: 20,
+	      mapHeight: 20,
+	      patterns: [
+	      ["glider",
+	      " o",
+	      "  o",
+	      "ooo"]],
+	      init: [
+	      {name: "glider", x:5, y:1}]
+	      });
+	      l1.show();
+	    </script>
+	  </td>
+	  <td id="gol2" align="center">
+	    <script>
+	      var l2 = new LoadBox("gameoflife", {
+	      container: "gol2",
+	      fps: 10,
+	      width: 200,
+	      height: 200,
+	      mapWidth: 50,
+	      mapHeight: 50,
+	      });
+	      l2.show();
+	    </script>
+	  </td>
+	  <td id="hourglass" align="center">
+	    <script>
+	      var l3 = new LoadBox("hourglass", {
+	      container: "hourglass"
+	      });
+	      l3.show();
+	    </script>
+	  </td>
+	</tr>
+      </tbody>
+    </table>
+  </body>
+</html>
