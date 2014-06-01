@@ -36,6 +36,13 @@ var loader = new LoadBox("gameoflife", {
     warp: true, // If the borders are connected
     mapWidth: 20, // Number of horizontal cells
     mapHeight: 20 // Number of vertical cells
+    patterns: [
+    ["glider",
+    " o",
+    "  o",
+    "ooo"]], // Array of patterns used to create a scene
+    init: [
+    {name: "glider", x:0, y:0, flip:false, flop:false}]
 });
 loader.show();
 ```

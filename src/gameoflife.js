@@ -11,10 +11,58 @@ function LoadBox_initGameoflife(box) {
     box._map = [];
     box._map[false] = new Array(box._w * box._h);
     box._map[true] = new Array(box._w * box._h);
+    loadPatterns(box);
+    initMap(box);
 
-    for (var j = box._w * box._h - 1; j >= 0; j--) {
-    	if ((box._map[false][j] = Math.random() < box._prob ? 1 : 0))
-    	    box._alive.push(j);
+    function loadPatterns(box) {
+	box._patterns = {};
+	if (!box._params.patterns)
+	    return;
+	for (var p in box._params.patterns) {
+	    var pat = box._params.patterns[p];
+	    if (pat.length)
+		box._patterns[pat[0]] = pat.splice(1);
+	}
+    }
+
+    function initMap(box) {
+	if (box._params.init) {
+	    for (var p in box._params.init) {
+		var init = box._params.init[p];
+		var pat = null;
+		if (!init.name || !(pat = box._patterns[init.name]))
+		    continue;
+		var flip = init.flip == undefined ? false : init.flip;
+		var flop = init.flop == undefined ? false : init.flop;
+		var max = 0;
+		if (flop) {
+		    for (var j = 0; j < pat.length; j++)
+			if (pat[j].length > max)
+			    max = pat[j].length;
+		}
+		for (var j = 0; j < pat.length; j++) {
+		    for (var i = 0; i < pat[j].length; i++) {
+			if (pat[j][i] == ' ')
+			    continue;
+			var cx = (init.x || 0) + (init.flop ? max - i - 1 : i);
+			var cy = (init.y || 0) + (init.flip ? pat.length - j - 1 : j);
+			if (box._warp) {
+			    cx = (cx + box._w) % box._w;
+			    cy = (cy + box._h) % box._h;
+			} else if (cx < 0 || cy < 0 || cx >= box._w || cy >= box._h)
+			    continue;
+			var n = idx(cx, cy);
+			box._map[false][n] = 1;
+			box._alive.push(n);
+		    }
+		}
+	    }
+	} else {
+	    for (var j = box._w * box._h - 1; j >= 0; j--) {
+    		if ((box._map[false][j] = Math.random() < box._prob ? 1 : 0))
+    		    box._alive.push(j);
+	    }
+	}
     }
 
     function idx(x, y) {

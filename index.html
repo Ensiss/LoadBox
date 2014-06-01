@@ -17,7 +17,21 @@
 	width: 300,
 	height: 300,
 	mapWidth: 100,
-	mapHeight: 100});
+	mapHeight: 100,
+	patterns: [
+	["glider",
+	" o",
+	"  o",
+	"ooo"],
+	["blinker",
+	"ooo"]],
+	init: [
+	{name: "glider", x:1, y:1},
+	{name: "glider", x:1, y:6},
+	{name: "glider", x:6, y:1},
+	{name: "glider", x:75, y:75, flip:true, flop:true},
+	{name: "blinker", x:50, y:50}]
+	});
 	loader.show();
       </script>
     </div>
