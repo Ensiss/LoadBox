@@ -3,6 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <script src="src/hourglass.js"></script>
     <script src="src/gameoflife.js"></script>
+    <script src="src/fountain.js"></script>
     <script src="src/loadbox.js"></script>
   </head>
 
@@ -10,9 +11,10 @@
     <table border>
       <tbody>
 	<tr>
-	  <td>GameOfLife glider</td>
-	  <td>GameOfLife random init</td>
-	  <td>Hourglass loader</td>
+	  <td><input type="button" onClick="l1._interval ? l1.hide() : l1.show();" value="GameOfLife glider"></td>
+	  <td><input type="button" onClick="l2._interval ? l2.hide() : l2.show();" value="GameOfLife random init"></td>
+	  <td><input type="button" onClick="l3._interval ? l3.hide() : l3.show();" value="Hourglass loader"></td>
+	  <td><input type="button" onClick="l4._interval ? l4.hide() : l4.show();" value="Fountain loader"></td>
 	</tr>
 	<tr>
 	  <td id="glider" align="center">
@@ -34,7 +36,6 @@
 	      init: [
 	      {name: "glider", x:5, y:1}]
 	      });
-	      l1.show();
 	    </script>
 	  </td>
 	  <td id="gol2" align="center">
@@ -47,7 +48,6 @@
 	      mapWidth: 50,
 	      mapHeight: 50,
 	      });
-	      l2.show();
 	    </script>
 	  </td>
 	  <td id="hourglass" align="center">
@@ -55,7 +55,16 @@
 	      var l3 = new LoadBox("hourglass", {
 	      container: "hourglass"
 	      });
-	      l3.show();
+	    </script>
+	  </td>
+	  <td id="fountain" align="center">
+	    <script>
+	      var l4 = new LoadBox("fountain", {
+	      container: "fountain",
+	      fps: 40,
+	      width: 200,
+	      height: 200
+	      });
 	    </script>
 	  </td>
 	</tr>
