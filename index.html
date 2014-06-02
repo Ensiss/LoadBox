@@ -1,36 +1,20 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script src="src/hourglass.js"></script>
-    <script src="src/gameoflife.js"></script>
+    <!-- <script src="src/hourglass.js"></script> -->
+    <!-- <script src="src/gameoflife.js"></script> -->
+    <script src="src/fountain.js"></script>
     <script src="src/loadbox.js"></script>
   </head>
 
   <body>
     <div id="loader">
-      GameOfLife loader:</br>
+      Fountain loader:</br>
       <script>
-	var loader = new LoadBox("gameoflife", {
-	fps: 25,
-	aliveProba: 0.5,
-	warp: true,
-	width: 300,
-	height: 300,
-	mapWidth: 100,
-	mapHeight: 100,
-	patterns: [
-	["glider",
-	" o",
-	"  o",
-	"ooo"],
-	["blinker",
-	"ooo"]],
-	init: [
-	{name: "glider", x:1, y:1},
-	{name: "glider", x:1, y:6},
-	{name: "glider", x:6, y:1},
-	{name: "glider", x:75, y:75, flip:true, flop:true},
-	{name: "blinker", x:50, y:50}]
+	var loader = new LoadBox("fountain", {
+	fps: 40,
+	width: 200,
+	height: 200
 	});
 	loader.show();
       </script>
