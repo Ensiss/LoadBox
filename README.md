@@ -3,22 +3,36 @@ LoadBox
 
 HTML5/javascript modular loader based on canvas.
 
+I also made a very basic [demo](http://ensiss.github.io/LoadBox/).
+
 ## Documentation
 
-### Hourglass loader
+### Fountain loader
+
+This simulation is an implementation of:
+
+> Simon Clavet, Philippe Beaudoin, and Pierre Poulin
+
+> [Particle-based Viscoelastic Fluid Simulation](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.59.9379&rep=rep1&type=pdf)
+
+> SIGGRAPH 2005
 
 ```js
-var loader = new LoadBox("hourglass", {
+var loader = new LoadBox("fountain", {
     container: "container-id", // (default = document body)
     width: 100, // Width of the loader
     height: 100, // Height of the loader
     fps: 25, // Number of frames per second
 
-    spawnBorder: 7, // Number of pixels in the hourglass where the sand does not spawn
-    holeSize: 3, // Size of the hourglass hole
-    stepsPerRotation: 500, // How long before the hourglass rotates
-    stepsPerFrame: 5, // Number of simulation steps per frame
-    fluidity: 0.8 // How fast the sand will spread
+    // Simulation tweaks
+    gravity: 100,
+    radius: 20,
+    theta: 1,
+    beta: 0,
+    stiffness: 200,
+    stiffness2: 40,
+    density: 5,
+    friction: 0
 });
 loader.show();
 ```
@@ -35,14 +49,35 @@ var loader = new LoadBox("gameoflife", {
     aliveProba: 0.5, // Chance that each cell will spawn alive
     warp: true, // If the borders are connected
     mapWidth: 20, // Number of horizontal cells
-    mapHeight: 20 // Number of vertical cells
-    patterns: [
+    mapHeight: 20, // Number of vertical cells
+    cellColor: "#000000", // Color of an alive cell
+    deadColor: "#FFFFFF", // Color of a dead cell
+    gridColor: "#000000", // Color of the grid. The grid is not drawn if this is not defined
+    patterns: [ // Array of patterns used to create a scene
     ["glider",
     " o",
     "  o",
-    "ooo"]], // Array of patterns used to create a scene
-    init: [
+    "ooo"]],
+    init: [ // Array of patterns, where and how to put them
     {name: "glider", x:0, y:0, flip:false, flop:false}]
+});
+loader.show();
+```
+
+### Hourglass loader
+
+```js
+var loader = new LoadBox("hourglass", {
+    container: "container-id", // (default = document body)
+    width: 100, // Width of the loader
+    height: 100, // Height of the loader
+    fps: 25, // Number of frames per second
+
+    spawnBorder: 7, // Number of pixels in the hourglass where the sand does not spawn
+    holeSize: 3, // Size of the hourglass hole
+    stepsPerRotation: 500, // How long before the hourglass rotates
+    stepsPerFrame: 5, // Number of simulation steps per frame
+    fluidity: 0.8 // How fast the sand will spread
 });
 loader.show();
 ```
