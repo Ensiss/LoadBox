@@ -48,7 +48,6 @@ ImageData.prototype.setPixel = function(x, y, col) {
     LoadBox.prototype.show = function() {
 	if (this.visible())
 	    return;
-	alert("showing");
 	var func = this.step;
 	this._interval = setInterval(function() { func() }, 1000 / this._fps);
 	this._div.style.display = "block";
@@ -57,7 +56,6 @@ ImageData.prototype.setPixel = function(x, y, col) {
     LoadBox.prototype.hide = function() {
 	if (!this.visible())
 	    return;
-	alert("hiding");
 	clearInterval(this._interval);
 	this._interval = null;
 	this._div.style.display = "none";
