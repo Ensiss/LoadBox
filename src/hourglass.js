@@ -19,12 +19,18 @@ var Sand = (function() {
 	_fluidity = fluidity;
     };
 
+    Sand.prototype.setColor = function(color) {
+	_color = color;
+    };
+
     Sand.prototype.erase = function(img) {
 	img.setPixel(this._x, this._y, _empty);
+	img.data[(this._y * img.width + this._x) * 4 + 3] = 0;
     };
 
     Sand.prototype.draw = function(img) {
 	img.setPixel(this._x, this._y, _color);
+	img.data[(this._y * img.width + this._x) * 4 + 3] = 255;
     };
 
     Sand.prototype.check = function(img, x, y, color) {
@@ -63,6 +69,7 @@ var Sand = (function() {
 function LoadBox_initHourglass(box) {
     var borders = box._params.spawnBorder || 7;
     var holesz = box._params.holeSize || 3;
+    var w = box._canvas.width;
 
     // Second canvas element for rotation
     box._tmpcan = box._addElement("canvas", box._div);
@@ -78,14 +85,19 @@ function LoadBox_initHourglass(box) {
     box._nframes = box._params.stepsPerRotation || 500;
     box._rotating = false;
     box._nsteps = box._params.stepsPerFrame || 5;
+    box._hgColor = 0x000000;
+    if (box._params.hourglassColor != undefined)
+	box._hgColor = box._params.hourglassColor;
 
     // Box and borders
     for (var j = 0; j < box._img.height; j++) {
 	for (var i = 0; i < box._img.width; i++) {
 	    if (!i || i == box._img.width - 1 || !j || j == box._img.height - 1)
-		box._img.setPixel(i, j, 0x000000);
-	    else
+		box._img.setPixel(i, j, box._hgColor);
+	    else {
 		box._img.setPixel(i, j, 0xFFFFFF);
+		box._img.data[(j * w + i) * 4 + 3] = 0;
+	    }
 	}
     }
 
@@ -96,22 +108,31 @@ function LoadBox_initHourglass(box) {
     		box._sand.push(new Sand(j, i));
     	    }
     	}
-    	box._img.setPixel(i, i, 0x000000);
-    	box._img.setPixel(i, 100 - i, 0x000000);
+    	box._img.setPixel(i, i, box._hgColor);
+    	box._img.setPixel(i, 100 - i, box._hgColor);
     }
 
     // Hourglass' hole
     for (var j = -holesz; j <= holesz; j++) {
 	for (var i = -holesz; i <= holesz; i++) {
+	    var x = box._img.width / 2 + i;
+	    var y = box._img.height / 2 + j;
 	    if (Math.abs(i) == holesz)
-		box._img.setPixel(box._img.width / 2 + i, box._img.height / 2 + j, 0x000000);
-	    else
-		box._img.setPixel(box._img.width / 2 + i, box._img.height / 2 + j, 0xFFFFFF);
+		box._img.setPixel(x, y, box._hgColor);
+	    else {
+		box._img.setPixel(x, y, 0xFFFFFF);
+		box._img.data[(y * w + x) * 4 + 3] = 0;
+	    }
 	}
     }
 
-    if (box._params.fluidity && box._sand.length)
-	box._sand[0].setFluidity(box._params.fluidity);
+    if (box._sand.length) {
+	if (box._params.fluidity)
+	    box._sand[0].setFluidity(box._params.fluidity);
+	if (box._params.color != undefined)
+	    box._sand[0].setColor(box._params.color);
+    }
+
     // Simulation step
     box.step = function() {
 	for (var stepi = 0; stepi < box._nsteps; stepi++) {
