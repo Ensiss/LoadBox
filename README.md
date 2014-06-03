@@ -33,6 +33,7 @@ This simulation is an implementation of:
 
 ```js
 var loader = new LoadBox("fountain", {
+    color: 0x0000FF, // Color of the particles
     // Simulation tweaks
     gravity: 100,
     radius: 20,
@@ -56,6 +57,7 @@ var loader = new LoadBox("gameoflife", {
     cellColor: "#000000", // Color of an alive cell
     deadColor: "#FFFFFF", // Color of a dead cell
     gridColor: "#000000", // Color of the grid. The grid is not drawn if this is not defined
+    gridThickness: 0, // Thickness of the grid lines
     patterns: [ // Array of patterns used to create a scene
     ["glider",
     " o",
@@ -74,7 +76,9 @@ var loader = new LoadBox("hourglass", {
     holeSize: 3, // Size of the hourglass hole
     stepsPerRotation: 500, // How long before the hourglass rotates
     stepsPerFrame: 5, // Number of simulation steps per frame
-    fluidity: 0.8 // How fast the sand will spread
+    fluidity: 0.8, // How fast the sand will spread
+    color: 0xEDC9AF, // Color of the sand
+    hourglassColor: 0x000000 // Color of the hourglass
 });
 ```
 

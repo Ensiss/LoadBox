@@ -86,6 +86,7 @@ function LoadBox_initFountain(box) {
     box._img = box._ctx.createImageData(box._canvas.width, box._canvas.height);
     box._manager = new ProximityManager(box._img.width, box._img.height, box._img.width / 20);
     box._list = [];
+    box._color = box._params.color == undefined ? 0x0000FF : box._params.color;
 
     // Timestep
     box._ts = 1.0 / 40;
@@ -209,6 +210,7 @@ function LoadBox_initFountain(box) {
 	    var p = box._list[i];
 	    box._manager.addElement(p);
 	    box._img.setPixel(parseInt(p.x), parseInt(p.y), 0xFFFFFF);
+	    box._img.data[(parseInt(p.y) * box._img.width + parseInt(p.x)) * 4 + 3] = 0;
 	    p.oldx = p.x;
 	    p.oldy = p.y;
 	    p.vy += box._grav * box._ts;
@@ -233,7 +235,8 @@ function LoadBox_initFountain(box) {
 		p.vx /= 2;
 	    }
 	    // Display the particle
-	    box._img.setPixel(parseInt(p.x), parseInt(p.y), 0x0000FF);
+	    box._img.setPixel(parseInt(p.x), parseInt(p.y), box._color);
+	    box._img.data[(parseInt(p.y) * box._img.width + parseInt(p.x)) * 4 + 3] = 255;
 	}
 	box._ctx.putImageData(box._img, 0, 0);
     };
