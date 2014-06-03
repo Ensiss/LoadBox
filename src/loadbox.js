@@ -41,18 +41,33 @@ ImageData.prototype.setPixel = function(x, y, col) {
 
     LoadBox.prototype.step = function() {};
 
+    LoadBox.prototype.visible = function() {
+	return (!!this._interval);
+    };
+
     LoadBox.prototype.show = function() {
+	if (this.visible())
+	    return;
+	alert("showing");
 	var func = this.step;
 	this._interval = setInterval(function() { func() }, 1000 / this._fps);
 	this._div.style.display = "block";
     };
 
     LoadBox.prototype.hide = function() {
-	if (this._interval) {
-	    clearInterval(this._interval);
-	    this._interval = null;
-	}
+	if (!this.visible())
+	    return;
+	alert("hiding");
+	clearInterval(this._interval);
+	this._interval = null;
 	this._div.style.display = "none";
+    };
+
+    LoadBox.prototype.toggle = function() {
+	if (this.visible())
+	    this.hide();
+	else
+	    this.show();
     };
 
     LoadBox.prototype._addElement = function(tag, parent) {
