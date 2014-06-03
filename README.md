@@ -7,6 +7,20 @@ I also made a very basic [demo](http://ensiss.github.io/LoadBox/).
 
 ## Documentation
 
+### API
+
+Here is the generic code used to initialize a new loader and the arguments that you can pass to any module.
+```js
+var loader = new LoadBox("modulename", {
+    container: "container-id", // (default = document body)
+    width: 100, // Width of the loader
+    height: 100, // Height of the loader
+    fps: 25, // Number of frames per second
+}
+loader.show();
+```
+Then you have to control the state of the loader to decide if it should be displayed or hidden by using the methods `show`, `hide` and `toggle`. To check the current state of the loader, use the `visible` method.
+
 ### Fountain loader
 
 This simulation is an implementation of:
@@ -19,11 +33,6 @@ This simulation is an implementation of:
 
 ```js
 var loader = new LoadBox("fountain", {
-    container: "container-id", // (default = document body)
-    width: 100, // Width of the loader
-    height: 100, // Height of the loader
-    fps: 25, // Number of frames per second
-
     // Simulation tweaks
     gravity: 100,
     radius: 20,
@@ -34,18 +43,12 @@ var loader = new LoadBox("fountain", {
     density: 5,
     friction: 0
 });
-loader.show();
 ```
 
 ### Conway's Game Of Life loader
 
 ```js
 var loader = new LoadBox("gameoflife", {
-    container: "container-id", // (default = document body)
-    width: 100, // Width of the loader
-    height: 100, // Height of the loader
-    fps: 25, // Number of frames per second
-
     aliveProba: 0.5, // Chance that each cell will spawn alive
     warp: true, // If the borders are connected
     mapWidth: 20, // Number of horizontal cells
@@ -61,32 +64,24 @@ var loader = new LoadBox("gameoflife", {
     init: [ // Array of patterns, where and how to put them
     {name: "glider", x:0, y:0, flip:false, flop:false}]
 });
-loader.show();
 ```
 
 ### Hourglass loader
 
 ```js
 var loader = new LoadBox("hourglass", {
-    container: "container-id", // (default = document body)
-    width: 100, // Width of the loader
-    height: 100, // Height of the loader
-    fps: 25, // Number of frames per second
-
     spawnBorder: 7, // Number of pixels in the hourglass where the sand does not spawn
     holeSize: 3, // Size of the hourglass hole
     stepsPerRotation: 500, // How long before the hourglass rotates
     stepsPerFrame: 5, // Number of simulation steps per frame
     fluidity: 0.8 // How fast the sand will spread
 });
-loader.show();
 ```
 
 ### How to extend ?
 
-Create a .js file that will be loaded before loadbox.js in your html document.
-In this file create a function named "LoadBox_init<Module>", that takes the box as parameter.
-This function is the constructor of your module, and will have to define the method "step" that will be called each frame.
+Create a .js file for your module with a function `LoadBox_init<Module>` in it, that takes the box as parameter.
+This function is the constructor of your module, and will have to define the method `step` that will be called each frame.
 ```js
 function LoadBox_initHourglass(box) {
     // Initialisation of the module
