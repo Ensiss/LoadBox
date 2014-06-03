@@ -87,6 +87,12 @@ function LoadBox_initFountain(box) {
     box._manager = new ProximityManager(box._img.width, box._img.height, box._img.width / 20);
     box._list = [];
     box._color = box._params.color == undefined ? 0x0000FF : box._params.color;
+    box._blobr = 10;
+    if ((box._blob = !!box._params.blob)) {
+	box._r = (box._color >> 16) & 0xFF;
+	box._g = (box._color >> 8) & 0xFF;
+	box._b = box._color & 0xFF;
+    }
 
     // Timestep
     box._ts = 1.0 / 40;
@@ -204,13 +210,17 @@ function LoadBox_initFountain(box) {
     };
 
     box.step = function() {
+	if (box._blob)
+	    box._ctx.clearRect(0, 0, box._img.width, box._img.height);
 	box._manager.clear();
 	// Set particles old position and reset proximity manager
 	for (var i in box._list) {
 	    var p = box._list[i];
 	    box._manager.addElement(p);
-	    box._img.setPixel(parseInt(p.x), parseInt(p.y), 0xFFFFFF);
-	    box._img.data[(parseInt(p.y) * box._img.width + parseInt(p.x)) * 4 + 3] = 0;
+	    if (!box._blob) {
+		box._img.setPixel(parseInt(p.x), parseInt(p.y), 0xFFFFFF);
+		box._img.data[(parseInt(p.y) * box._img.width + parseInt(p.x)) * 4 + 3] = 0;
+	    }
 	    p.oldx = p.x;
 	    p.oldy = p.y;
 	    p.vy += box._grav * box._ts;
@@ -235,8 +245,31 @@ function LoadBox_initFountain(box) {
 		p.vx /= 2;
 	    }
 	    // Display the particle
-	    box._img.setPixel(parseInt(p.x), parseInt(p.y), box._color);
-	    box._img.data[(parseInt(p.y) * box._img.width + parseInt(p.x)) * 4 + 3] = 255;
+	    if (!box._blob) {
+		box._img.setPixel(parseInt(p.x), parseInt(p.y), box._color);
+		box._img.data[(parseInt(p.y) * box._img.width + parseInt(p.x)) * 4 + 3] = 255;
+	    } else {
+		var grd = box._ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, box._blobr);
+		grd.addColorStop(0, "rgba(0, 0, 255, 0.5)");
+		grd.addColorStop(1, "rgba(255, 255, 255, 0)");
+		box._ctx.beginPath();
+		box._ctx.arc(p.x, p.y, box._blobr, 0, 2 * Math.PI, false);
+		box._ctx.fillStyle = grd;
+		box._ctx.fill();
+	    }
+	}
+
+	if (box._blob) {
+	    box._img = box._ctx.getImageData(0, 0, box._img.width, box._img.height);
+	    for (var i = box._img.width * box._img.height * 4 - 4; i >= 0; i -= 4) {
+		if (box._img.data[i + 3] > 125 && box._img.data[i + 2] > 125) {
+		    box._img.data[i + 0] = box._r;
+		    box._img.data[i + 1] = box._g;
+		    box._img.data[i + 2] = box._b;
+		    box._img.data[i + 3] = 255;
+		} else
+		    box._img.data[i + 3] = 0;
+	    }
 	}
 	box._ctx.putImageData(box._img, 0, 0);
     };
