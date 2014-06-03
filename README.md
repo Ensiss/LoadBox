@@ -34,6 +34,8 @@ This simulation is an implementation of:
 ```js
 var loader = new LoadBox("fountain", {
     color: 0x0000FF, // Color of the particles
+    blob: false, // Render blobs instead of particles (**beta**)
+    blobr: 10, // Radius of the blobs (**beta**)
     // Simulation tweaks
     gravity: 100,
     radius: 20,
