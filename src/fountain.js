@@ -1,62 +1,58 @@
 var ProximityManager = (function() {
     "use strict";
 
-    var _w;
-    var _h;
-    var _nodes;
-    var _nodex;
-    var _nodey;
-    var _map;
-    var _clear;
-
     function ProximityManager(w, h, div) {
-	_w = w;
-	_h = h;
-	_nodes = div;
-	_nodex = _w / _nodes;
-	_nodey = _h / _nodes;
-	_clear = [];
-	_map = new Array(_nodes);
-	for (var y = 0; y < _nodes; y++) {
-	    _map[y] = new Array(_nodes);
-	    for (var x = 0; x < _nodes; x++)
-		_map[y][x] = {elms:[], cache:[], cached:false}
+	this._nodes = div;
+	this._nodex = w / this._nodes;
+	this._nodey = h / this._nodes;
+	this._clear = [];
+	this._map = new Array(this._nodes);
+	for (var y = 0; y < this._nodes; y++) {
+	    this._map[y] = new Array(this._nodes);
+	    for (var x = 0; x < this._nodes; x++)
+		this._map[y][x] = {elms:[], cache:[], cached:false}
 	}
     };
 
     ProximityManager.prototype.addElement = function(elm) {
-	var x = parseInt(elm.x / _nodex);
-	var y = parseInt(elm.y / _nodey);
-	if (x < 0 || x >= _nodes || y < 0 || y >= _nodes)
+	var x = parseInt(elm.x / this._nodex);
+	var y = parseInt(elm.y / this._nodey);
+	if (x < 0 || x >= this._nodes || y < 0 || y >= this._nodes)
 	    return (false);
-	if (!_map[y][x].elms.length)
-	    _clear.push(y * _nodes + x);
-	_map[y][x].elms.push(elm);
+	if (!this._map[y][x].elms.length)
+	    this._clear.push(y * this._nodes + x);
+	this._map[y][x].elms.push(elm);
 	return (true);
     };
 
     ProximityManager.prototype.clear = function() {
-	for (var i in _clear) {
-	    var n = _clear[i];
-	    var node = _map[parseInt(n / _nodes)][n % _nodes];
+	for (var i in this._clear) {
+	    var n = this._clear[i];
+	    var node = this._map[parseInt(n / this._nodes)][n % this._nodes];
 	    node.elms = [];
 	    node.cache = [];
 	    node.cached = false;
 	}
-	_clear = [];
+	this._clear = [];
+    };
+
+    ProximityManager.prototype.get = function(x, y) {
+	if (x < 0 || y < 0 || y >= this._nodes || x >= this._nodes)
+	    return (false);
+	return this._map[y][x];
     };
 
     ProximityManager.prototype.query = function(x, y) {
-	x = parseInt(x / _nodex);
-	y = parseInt(y / _nodey);
-	if (x < 0 || x >= _nodes || y < 0 || y >= _nodes)
+	x = parseInt(x / this._nodex);
+	y = parseInt(y / this._nodey);
+	if (x < 0 || x >= this._nodes || y < 0 || y >= this._nodes)
 	    return (false);
-	var node = _map[y][x]
+	var node = this._map[y][x]
 	if (!node.cached) {
 	    for (var j = -1; j <= 1; j++) {
 		for (var i = -1; i <= 1; i++) {
-		    if (x + i >= 0 && x + i < _nodes && y + j >= 0 && y + j < _nodes)
-			node.cache = node.cache.concat(_map[y + j][x + i].elms);
+		    if (x + i >= 0 && x + i < this._nodes && y + j >= 0 && y + j < this._nodes)
+			node.cache = node.cache.concat(this._map[y + j][x + i].elms);
 		}
 	    }
 	    node.cached = true;
