@@ -75,6 +75,21 @@ var Particle = (function() {
 	this.oldy = py;
     };
 
+    Particle.prototype.resetVelocity = function(box) {
+	this.vx = (this.x - this.oldx) / box._ts;
+	this.vy = (this.y - this.oldy) / box._ts;
+    }
+
+    Particle.prototype.addVelocity = function(x, y) {
+	this.vx += x;
+	this.vy += y;
+    }
+
+    Particle.prototype.addPosition = function(x, y) {
+	this.x += x;
+	this.y += y;
+    }
+
     return (Particle);
 })();
 
@@ -137,10 +152,8 @@ function LoadBox_initFountain(box) {
 			iy = box._ts * (1 - q) * (box._theta * u + box._beta * u * u);
 			ix = (iy * rvx) / 2.0;
 			iy = (iy * rvy) / 2.0;
-			i.vx -= ix;
-			i.vy -= iy;
-			j.vx += ix;
-			j.vy += iy;
+			i.addVelocity(-ix, -iy);
+			j.addVelocity(ix, iy);
 		    }
 		}
 	    }
@@ -180,14 +193,12 @@ function LoadBox_initFountain(box) {
 		    dy = box._ts2 * (press * (1 - q) + press_n * pow(1 - q));
 		    dx = dy * ((j.x - i.x) / r);
 		    dy = dy * ((j.y - i.y) / r);
-		    j.x += dx;
-		    j.y += dy;
+		    j.addPosition(dx, dy);
 		    dxx -= dx;
 		    dxy -= dy;
 		}
 	    }
-	    i.x += dxx;
-	    i.y += dxy;
+	    i.addPosition(dxx, dxy);
 	}
     };
 
@@ -225,16 +236,14 @@ function LoadBox_initFountain(box) {
 	// Move particles
 	for (var i in box._list) {
 	    var p = box._list[i];
-	    p.x += p.vx * box._ts;
-	    p.y += p.vy * box._ts;
+	    p.addPosition(p.vx * box._ts, p.vy * box._ts);
 	}
 	doubleDensityRelaxation();
 	resolveCollisions();
 	for (var i in box._list) {
 	    var p = box._list[i];
 	    // Update velocity
-	    p.vx = (p.x - p.oldx) / box._ts;
-	    p.vy = (p.y - p.oldy) / box._ts;
+	    p.resetVelocity(box);
 	    // Fountain effect
 	    if (Math.abs(p.x - box._img.width / 2) < 10 && box._img.height - p.y < 75) {
 		p.vy -= 10;
