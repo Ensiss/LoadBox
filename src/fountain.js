@@ -90,6 +90,31 @@ var Particle = (function() {
 	this.y += y;
     }
 
+    Particle.prototype.testLineX = function(img) {
+	var dir = this.x >= this.oldx ? 1 : -1;
+	var step = (this.y - this.oldy) / Math.abs(this.x - this.oldx);
+	while (img.data[(parseInt(this.x) + img.width * parseInt(this.y)) * 4 + 3]) {
+	    this.x -= dir;
+	    this.y -= step;
+	}
+    }
+
+    Particle.prototype.testLineY = function(img) {
+	var dir = this.y >= this.oldy ? 1 : -1;
+	var step = (this.x - this.oldx) / Math.abs(this.y - this.oldy);
+	while (img.data[(parseInt(this.x) + img.width * parseInt(this.y)) * 4 + 3]) {
+	    this.x -= step;
+	    this.y -= dir;
+	}
+    }
+
+    Particle.prototype.collide = function(img) {
+	if (Math.abs(this.x - this.oldx) > Math.abs(this.y - this.oldy))
+	    this.y != this.oldy && this.testLineX(img);
+	else
+	    this.x != this.oldx && this.testLineY(img);
+    }
+
     return (Particle);
 })();
 
@@ -120,10 +145,15 @@ function LoadBox_initFountain(box) {
     box._friction = box._params.friction || 0;
 
     // Spawn particles
-    for (var j = 50; j < box._img.height; j += 3) {
-	for (var i = -25; i <= 25; i += 10) {
-	    box._list.push(new Particle(box._img.width / 2 + i, j + i % 5));
-	}
+    for (var j = 100; j < box._img.height; j += 3) {
+    	for (var i = -25; i <= 25; i += 10) {
+    	    box._list.push(new Particle(box._img.width / 2 + i, j + i % 5));
+    	}
+    }
+
+    for (var j = 0; j < 50; j++) {
+	for (var i = 25; i < 175; i++)
+	    box._img.setPixel(i, 50 + j, 0x000000);
     }
 
     function pow(x) { return (x * x); };
@@ -213,6 +243,7 @@ function LoadBox_initFountain(box) {
 		i.vx *= -1;
 		i.x = i.x < 0 ? 0 : box._img.width - 5;
 	    }
+	    i.collide(box._img);
 	}
     };
 
