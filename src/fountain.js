@@ -93,18 +93,32 @@ var Particle = (function() {
     Particle.prototype.testLineX = function(img) {
 	var dir = this.x >= this.oldx ? 1 : -1;
 	var step = (this.y - this.oldy) / Math.abs(this.x - this.oldx);
-	while (img.data[(parseInt(this.x) + img.width * parseInt(this.y)) * 4 + 3]) {
-	    this.x -= dir;
-	    this.y -= step;
+	var px = this.oldx;
+	var py = this.oldy;
+	while (dir > 0 ? this.x >= px : px >= this.x) {
+	    if (img.data[(parseInt(px + dir) + img.width * parseInt(py + step)) * 4 + 3]) {
+		this.x = px;
+		this.y = py;
+		return;
+	    }
+	    px += dir;
+	    py += step;
 	}
     }
 
     Particle.prototype.testLineY = function(img) {
 	var dir = this.y >= this.oldy ? 1 : -1;
 	var step = (this.x - this.oldx) / Math.abs(this.y - this.oldy);
-	while (img.data[(parseInt(this.x) + img.width * parseInt(this.y)) * 4 + 3]) {
-	    this.x -= step;
-	    this.y -= dir;
+	var px = this.oldx;
+	var py = this.oldy;
+	while (dir > 0 ? this.y >= py : py >= this.y) {
+	    if (img.data[(parseInt(px + step) + img.width * parseInt(py + dir)) * 4 + 3]) {
+		this.x = px;
+		this.y = py;
+		return;
+	    }
+	    px += step;
+	    py += dir;
 	}
     }
 
@@ -152,8 +166,8 @@ function LoadBox_initFountain(box) {
     }
 
     for (var j = 0; j < 50; j++) {
-	for (var i = 25; i < 175; i++)
-	    box._img.setPixel(i, 50 + j, 0x000000);
+    	for (var i = 25; i < 175; i++)
+    	    box._img.setPixel(i, 50 + j, 0x000000);
     }
 
     function pow(x) { return (x * x); };
