@@ -159,15 +159,39 @@ function LoadBox_initFountain(box) {
     box._friction = box._params.friction || 0;
 
     // Spawn particles
-    for (var j = 100; j < box._img.height; j += 3) {
-    	for (var i = -25; i <= 25; i += 10) {
-    	    box._list.push(new Particle(box._img.width / 2 + i, j + i % 5));
-    	}
-    }
+    // for (var i = 0; i < 600; i++)
+    // 	box._list.push(new Particle(100 + i % 5, 100 + i / 5));
+    for (var i = 0; i < 600; i++)
+    	box._list.push(new Particle(100, 100));
 
-    for (var j = 0; j < 50; j++) {
-    	for (var i = 25; i < 175; i++)
-    	    box._img.setPixel(i, 50 + j, 0x000000);
+    var scupw = 70;
+    var scuph = 25;
+    var scupy = box._img.height / 2;
+    var scuphole = 10;
+    var bcuph = 25;
+    var pipey = box._img.height - 20;
+
+    // Small cup bottom
+    for (var j = scuphole; j <= scupw; j++) {
+	box._img.setPixel(box._img.width / 2 - j, scupy);
+	box._img.setPixel(box._img.width / 2 + j, scupy);
+    }
+    // Small cup borders
+    for (var j = 0; j < scuph; j++) {
+	box._img.setPixel(box._img.width / 2 - scupw, scupy - j);
+	box._img.setPixel(box._img.width / 2 + scupw, scupy - j);
+    }
+    // Pipe
+    for (var j = scupy - 25; j < pipey; j++) {
+	box._img.setPixel(box._img.width / 2 - scuphole, j);
+	box._img.setPixel(box._img.width / 2 + scuphole, j);
+    }
+    // Big cup
+    for (var j = 0; j < box._img.width; j++)
+	box._img.setPixel(j, box._img.height - 1);
+    for (var j = 1; j < bcuph; j++) {
+	box._img.setPixel(0, box._img.height - j);
+	box._img.setPixel(box._img.width - 1, box._img.height - j);
     }
 
     function pow(x) { return (x * x); };
@@ -249,13 +273,13 @@ function LoadBox_initFountain(box) {
     function resolveCollisions() {
 	for (var it in box._list) {
 	    var i = box._list[it];
-	    if (i.y >= box._img.height - 5 || i.y < 0) {
+	    if (i.y >= box._img.height - 3 || i.y < 2) {
 		i.vy *= -1;
-		i.y = i.y < 0 ? 0 : box._img.height - 5;
+		i.y = i.y < 2 ? 2 : box._img.height - 3;
 	    }
-	    if (i.x >= box._img.width - 5 || i.x < 0) {
+	    if (i.x >= box._img.width - 3 || i.x < 2) {
 		i.vx *= -1;
-		i.x = i.x < 0 ? 0 : box._img.width - 5;
+		i.x = i.x < 2 ? 2 : box._img.width - 3;
 	    }
 	    i.collide(box._img);
 	}
@@ -290,10 +314,16 @@ function LoadBox_initFountain(box) {
 	    // Update velocity
 	    p.resetVelocity(box);
 	    // Fountain effect
-	    if (Math.abs(p.x - box._img.width / 2) < 10 && box._img.height - p.y < 75) {
+	    if (Math.abs(p.x - box._img.width / 2) < scuphole - 2 && p.y > scupy - 25) {
 		p.vy -= 10;
 		p.vx /= 2;
+	    } else if (p.y > pipey) {
+		p.vx -= (p.x - box._img.width / 2) / 100;
 	    }
+
+	    p.vx += (Math.random() * 2 - 1) * 0.000001;
+	    p.vy += (Math.random() * 2 - 1) * 0.000001;
+
 	    // Display the particle
 	    if (!box._blob) {
 		box._img.setPixel(parseInt(p.x), parseInt(p.y), box._color);
