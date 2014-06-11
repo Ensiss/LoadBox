@@ -1,62 +1,58 @@
 var ProximityManager = (function() {
     "use strict";
 
-    var _w;
-    var _h;
-    var _nodes;
-    var _nodex;
-    var _nodey;
-    var _map;
-    var _clear;
-
     function ProximityManager(w, h, div) {
-	_w = w;
-	_h = h;
-	_nodes = div;
-	_nodex = _w / _nodes;
-	_nodey = _h / _nodes;
-	_clear = [];
-	_map = new Array(_nodes);
-	for (var y = 0; y < _nodes; y++) {
-	    _map[y] = new Array(_nodes);
-	    for (var x = 0; x < _nodes; x++)
-		_map[y][x] = {elms:[], cache:[], cached:false}
+	this._nodes = div;
+	this._nodex = w / this._nodes;
+	this._nodey = h / this._nodes;
+	this._clear = [];
+	this._map = new Array(this._nodes);
+	for (var y = 0; y < this._nodes; y++) {
+	    this._map[y] = new Array(this._nodes);
+	    for (var x = 0; x < this._nodes; x++)
+		this._map[y][x] = {elms:[], cache:[], cached:false}
 	}
     };
 
     ProximityManager.prototype.addElement = function(elm) {
-	var x = parseInt(elm.x / _nodex);
-	var y = parseInt(elm.y / _nodey);
-	if (x < 0 || x >= _nodes || y < 0 || y >= _nodes)
+	var x = parseInt(elm.x / this._nodex);
+	var y = parseInt(elm.y / this._nodey);
+	if (x < 0 || x >= this._nodes || y < 0 || y >= this._nodes)
 	    return (false);
-	if (!_map[y][x].elms.length)
-	    _clear.push(y * _nodes + x);
-	_map[y][x].elms.push(elm);
+	if (!this._map[y][x].elms.length)
+	    this._clear.push(y * this._nodes + x);
+	this._map[y][x].elms.push(elm);
 	return (true);
     };
 
     ProximityManager.prototype.clear = function() {
-	for (var i in _clear) {
-	    var n = _clear[i];
-	    var node = _map[parseInt(n / _nodes)][n % _nodes];
+	for (var i in this._clear) {
+	    var n = this._clear[i];
+	    var node = this._map[parseInt(n / this._nodes)][n % this._nodes];
 	    node.elms = [];
 	    node.cache = [];
 	    node.cached = false;
 	}
-	_clear = [];
+	this._clear = [];
+    };
+
+    ProximityManager.prototype.get = function(x, y) {
+	if (x < 0 || y < 0 || y >= this._nodes || x >= this._nodes)
+	    return (false);
+	return this._map[y][x];
     };
 
     ProximityManager.prototype.query = function(x, y) {
-	x = parseInt(x / _nodex);
-	y = parseInt(y / _nodey);
-	if (x < 0 || x >= _nodes || y < 0 || y >= _nodes)
+	x = parseInt(x / this._nodex);
+	y = parseInt(y / this._nodey);
+	if (x < 0 || x >= this._nodes || y < 0 || y >= this._nodes)
 	    return (false);
-	var node = _map[y][x]
+	var node = this._map[y][x]
 	if (!node.cached) {
 	    for (var j = -1; j <= 1; j++) {
 		for (var i = -1; i <= 1; i++) {
-		    if (x + i >= 0 && x + i < _nodes && y + j >= 0 && y + j < _nodes)
-			node.cache = node.cache.concat(_map[y + j][x + i].elms);
+		    if (x + i >= 0 && x + i < this._nodes && y + j >= 0 && y + j < this._nodes)
+			node.cache = node.cache.concat(this._map[y + j][x + i].elms);
 		}
 	    }
 	    node.cached = true;
@@ -78,6 +74,60 @@ var Particle = (function() {
 	this.oldx = px;
 	this.oldy = py;
     };
+
+    Particle.prototype.resetVelocity = function(box) {
+	this.vx = (this.x - this.oldx) / box._ts;
+	this.vy = (this.y - this.oldy) / box._ts;
+    }
+
+    Particle.prototype.addVelocity = function(x, y) {
+	this.vx += x;
+	this.vy += y;
+    }
+
+    Particle.prototype.addPosition = function(x, y) {
+	this.x += x;
+	this.y += y;
+    }
+
+    Particle.prototype.testLineX = function(img) {
+	var dir = this.x >= this.oldx ? 1 : -1;
+	var step = (this.y - this.oldy) / Math.abs(this.x - this.oldx);
+	var px = this.oldx;
+	var py = this.oldy;
+	while (dir > 0 ? this.x >= px : px >= this.x) {
+	    if (img.data[(parseInt(px + dir) + img.width * parseInt(py + step)) * 4 + 3]) {
+		this.x = px;
+		this.y = py;
+		return;
+	    }
+	    px += dir;
+	    py += step;
+	}
+    }
+
+    Particle.prototype.testLineY = function(img) {
+	var dir = this.y >= this.oldy ? 1 : -1;
+	var step = (this.x - this.oldx) / Math.abs(this.y - this.oldy);
+	var px = this.oldx;
+	var py = this.oldy;
+	while (dir > 0 ? this.y >= py : py >= this.y) {
+	    if (img.data[(parseInt(px + step) + img.width * parseInt(py + dir)) * 4 + 3]) {
+		this.x = px;
+		this.y = py;
+		return;
+	    }
+	    px += step;
+	    py += dir;
+	}
+    }
+
+    Particle.prototype.collide = function(img) {
+	if (Math.abs(this.x - this.oldx) > Math.abs(this.y - this.oldy))
+	    this.y != this.oldy && this.testLineX(img);
+	else
+	    this.x != this.oldx && this.testLineY(img);
+    }
 
     return (Particle);
 })();
@@ -109,10 +159,39 @@ function LoadBox_initFountain(box) {
     box._friction = box._params.friction || 0;
 
     // Spawn particles
-    for (var j = 50; j < box._img.height; j += 3) {
-	for (var i = -25; i <= 25; i += 10) {
-	    box._list.push(new Particle(box._img.width / 2 + i, j + i % 5));
-	}
+    // for (var i = 0; i < 600; i++)
+    // 	box._list.push(new Particle(100 + i % 5, 100 + i / 5));
+    for (var i = 0; i < 600; i++)
+    	box._list.push(new Particle(100, 100));
+
+    var scupw = 70;
+    var scuph = 25;
+    var scupy = box._img.height / 2;
+    var scuphole = 10;
+    var bcuph = 25;
+    var pipey = box._img.height - 20;
+
+    // Small cup bottom
+    for (var j = scuphole; j <= scupw; j++) {
+	box._img.setPixel(box._img.width / 2 - j, scupy);
+	box._img.setPixel(box._img.width / 2 + j, scupy);
+    }
+    // Small cup borders
+    for (var j = 0; j < scuph; j++) {
+	box._img.setPixel(box._img.width / 2 - scupw, scupy - j);
+	box._img.setPixel(box._img.width / 2 + scupw, scupy - j);
+    }
+    // Pipe
+    for (var j = scupy - 25; j < pipey; j++) {
+	box._img.setPixel(box._img.width / 2 - scuphole, j);
+	box._img.setPixel(box._img.width / 2 + scuphole, j);
+    }
+    // Big cup
+    for (var j = 0; j < box._img.width; j++)
+	box._img.setPixel(j, box._img.height - 1);
+    for (var j = 1; j < bcuph; j++) {
+	box._img.setPixel(0, box._img.height - j);
+	box._img.setPixel(box._img.width - 1, box._img.height - j);
     }
 
     function pow(x) { return (x * x); };
@@ -141,10 +220,8 @@ function LoadBox_initFountain(box) {
 			iy = box._ts * (1 - q) * (box._theta * u + box._beta * u * u);
 			ix = (iy * rvx) / 2.0;
 			iy = (iy * rvy) / 2.0;
-			i.vx -= ix;
-			i.vy -= iy;
-			j.vx += ix;
-			j.vy += iy;
+			i.addVelocity(-ix, -iy);
+			j.addVelocity(ix, iy);
 		    }
 		}
 	    }
@@ -184,28 +261,27 @@ function LoadBox_initFountain(box) {
 		    dy = box._ts2 * (press * (1 - q) + press_n * pow(1 - q));
 		    dx = dy * ((j.x - i.x) / r);
 		    dy = dy * ((j.y - i.y) / r);
-		    j.x += dx;
-		    j.y += dy;
+		    j.addPosition(dx, dy);
 		    dxx -= dx;
 		    dxy -= dy;
 		}
 	    }
-	    i.x += dxx;
-	    i.y += dxy;
+	    i.addPosition(dxx, dxy);
 	}
     };
 
     function resolveCollisions() {
 	for (var it in box._list) {
 	    var i = box._list[it];
-	    if (i.y >= box._img.height - 5 || i.y < 0) {
+	    if (i.y >= box._img.height - 3 || i.y < 2) {
 		i.vy *= -1;
-		i.y = i.y < 0 ? 0 : box._img.height - 5;
+		i.y = i.y < 2 ? 2 : box._img.height - 3;
 	    }
-	    if (i.x >= box._img.width - 5 || i.x < 0) {
+	    if (i.x >= box._img.width - 3 || i.x < 2) {
 		i.vx *= -1;
-		i.x = i.x < 0 ? 0 : box._img.width - 5;
+		i.x = i.x < 2 ? 2 : box._img.width - 3;
 	    }
+	    i.collide(box._img);
 	}
     };
 
@@ -229,21 +305,25 @@ function LoadBox_initFountain(box) {
 	// Move particles
 	for (var i in box._list) {
 	    var p = box._list[i];
-	    p.x += p.vx * box._ts;
-	    p.y += p.vy * box._ts;
+	    p.addPosition(p.vx * box._ts, p.vy * box._ts);
 	}
 	doubleDensityRelaxation();
 	resolveCollisions();
 	for (var i in box._list) {
 	    var p = box._list[i];
 	    // Update velocity
-	    p.vx = (p.x - p.oldx) / box._ts;
-	    p.vy = (p.y - p.oldy) / box._ts;
+	    p.resetVelocity(box);
 	    // Fountain effect
-	    if (Math.abs(p.x - box._img.width / 2) < 10 && box._img.height - p.y < 75) {
+	    if (Math.abs(p.x - box._img.width / 2) < scuphole - 2 && p.y > scupy - 25) {
 		p.vy -= 10;
 		p.vx /= 2;
+	    } else if (p.y > pipey) {
+		p.vx -= (p.x - box._img.width / 2) / 100;
 	    }
+
+	    p.vx += (Math.random() * 2 - 1) * 0.000001;
+	    p.vy += (Math.random() * 2 - 1) * 0.000001;
+
 	    // Display the particle
 	    if (!box._blob) {
 		box._img.setPixel(parseInt(p.x), parseInt(p.y), box._color);
